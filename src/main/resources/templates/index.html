@@ -1,10 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Holder Management - Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .stats-card {
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 <body>
-$END$
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h5 class="text-center mb-3">
+                    <i class="fas fa-credit-card"></i> Card Manager
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/web/">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/users">
+                            <i class="fas fa-users"></i> Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/users/new">
+                            <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards">
+                            <i class="fas fa-credit-card"></i> Toutes les Cartes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards/active">
+                            <i class="fas fa-check-circle"></i> Cartes Actives
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards/expired">
+                            <i class="fas fa-times-circle"></i> Cartes Expirées
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="pt-3">
+                <h1 class="h2 mb-4">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+                </h1>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-primary stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" th:text="${totalUsers}">0</h4>
+                                        <p class="card-text">Utilisateurs</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-users fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-success stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" th:text="${activeCards}">0</h4>
+                                        <p class="card-text">Cartes Actives</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-warning stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" th:text="${expiredCards}">0</h4>
+                                        <p class="card-text">Cartes Expirées</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-times-circle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-info stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" th:text="${totalCards}">0</h4>
+                                        <p class="card-text">Total Cartes</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-credit-card fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-rocket"></i> Actions Rapides</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a href="/web/users/new" class="btn btn-primary">
+                                        <i class="fas fa-user-plus"></i> Créer un Utilisateur
+                                    </a>
+                                    <a href="/web/users" class="btn btn-outline-primary">
+                                        <i class="fas fa-users"></i> Voir tous les Utilisateurs
+                                    </a>
+                                    <a href="/web/cards" class="btn btn-outline-secondary">
+                                        <i class="fas fa-search"></i> Rechercher des Cartes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Informations</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Bienvenue dans le système de gestion des porteurs de cartes.</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success"></i> Gestion des utilisateurs</li>
+                                    <li><i class="fas fa-check text-success"></i> Gestion des cartes bancaires</li>
+                                    <li><i class="fas fa-check text-success"></i> Recherche avancée</li>
+                                    <li><i class="fas fa-check text-success"></i> Validation des données</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

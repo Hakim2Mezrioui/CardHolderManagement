@@ -1,10 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajouter une Carte</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .sidebar {
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+  </style>
 </head>
 <body>
-$END$
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+      <div class="position-sticky pt-3">
+        <h5 class="text-center mb-3">
+          <i class="fas fa-credit-card"></i> Card Manager
+        </h5>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="/web/">
+              <i class="fas fa-home"></i> Accueil
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/web/users">
+              <i class="fas fa-users"></i> Utilisateurs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/web/users/new">
+              <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/web/cards">
+              <i class="fas fa-credit-card"></i> Toutes les Cartes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/web/cards/active">
+              <i class="fas fa-check-circle"></i> Cartes Actives
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/web/cards/expired">
+              <i class="fas fa-times-circle"></i> Cartes Expirées
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="pt-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h2">
+            <i class="fas fa-credit-card"></i> Ajouter une Carte
+          </h1>
+          <a th:href="@{/web/users/{id}(id=${user.id})}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+          </a>
+        </div>
+
+        <!-- User Info -->
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i>
+          Ajout d'une carte pour : <strong th:text="${user.name}"></strong>
+          (<span th:text="${user.email}"></span>)
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-body">
+                <form th:action="@{/web/users/{userId}/cards(userId=${user.id})}"
+                      th:object="${card}" method="post">
+
+                  <div class="mb-3">
+                    <label for="cardNumber" class="form-label">
+                      <i class="fas fa-credit-card"></i> Numéro de carte *
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           th:field="*{cardNumber}"
+                           th:class="${#fields.hasErrors('cardNumber')} ? 'form-control is-invalid' : 'form-control'"
+                           id="cardNumber"
+                           placeholder="1234567890123456"
+                           maxlength="16">
+                    <div class="form-text">16 chiffres exactement</div>
+                    <div th:if="${#fields.hasErrors('cardNumber')}" class="invalid-feedback">
+                      <span th:errors="*{cardNumber}"></span>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="type" class="form-label">
+                      <i class="fas fa-tags"></i> Type de carte *
+                    </label>
+                    <select class="form-select"
+                            th:field="*{type}"
+                            th:class="${#fields.hasErrors('type')} ? 'form-select is-invalid' : 'form-select'"
+                            id="type">
+                      <option value="">Sélectionnez un type</option>
+                      <option value="Visa">Visa</option>
+                      <option value="Mastercard">Mastercard</option>
+                      <option value="American Express">American Express</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('type')}" class="invalid-feedback">
+                      <span th:errors="*{type}"></span>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="expirationDate" class="form-label">
+                          <i class="fas fa-calendar"></i> Date d'expiration *
+                        </label>
+                        <input type="date"
+                               class="form-control"
+                               th:field="*{expirationDate}"
+                               th:class="${#fields.hasErrors('expirationDate')} ? 'form-control is-invalid' : 'form-control'"
+                               id="expirationDate">
+                        <div class="form-text">Doit être dans le futur</div>
+                        <div th:if="${#fields.hasErrors('expirationDate')}" class="invalid-feedback">
+                          <span th:errors="*{expirationDate}"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="cvv" class="form-label">
+                          <i class="fas fa-lock"></i> CVV *
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               th:field="*{cvv}"
+                               th:class="${#fields.hasErrors('cvv')} ? 'form-control is-invalid' : 'form-control'"
+                               id="cvv"
+                               placeholder="123"
+                               maxlength="3">
+                        <div class="form-text">3 chiffres exactement</div>
+                        <div th:if="${#fields.hasErrors('cvv')}" class="invalid-feedback">
+                          <span th:errors="*{cvv}"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a th:href="@{/web/users/{id}(id=${user.id})}" class="btn btn-secondary me-md-2">
+                      <i class="fas fa-times"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                      <i class="fas fa-save"></i> Ajouter la Carte
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -24,7 +24,7 @@
                 </h5>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="/web/">
+                        <a class="nav-link" href="/web">
                             <i class="fas fa-home"></i> Accueil
                         </a>
                     </li>
@@ -70,6 +70,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
+                <!-- Debug info -->
+                <div class="alert alert-info">
+                    <strong>Debug:</strong> Nombre d'utilisateurs = <span th:text="${users != null ? users.size() : 'null'}"></span>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h2">
                         <i class="fas fa-users"></i> Liste des Utilisateurs
@@ -83,7 +88,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <div th:if="${#lists.isEmpty(users)}" class="text-center py-4">
+                                <div th:if="${users == null or users.isEmpty()}" class="text-center py-4">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">Aucun utilisateur trouvé</h5>
                                     <p class="text-muted">Commencez par créer votre premier utilisateur.</p>
@@ -92,7 +97,7 @@
                                     </a>
                                 </div>
 
-                                <div th:if="${!#lists.isEmpty(users)}" class="table-responsive">
+                                <div th:if="${users != null and !users.isEmpty()}" class="table-responsive">
                                     <table class="table table-hover">
                                         <thead class="table-dark">
                                         <tr>
@@ -117,7 +122,7 @@
                                             </td>
                                             <td th:text="${user.birthDate}"></td>
                                             <td>
-                                                <span class="badge bg-info" th:text="${#lists.size(user.cards ?: {})}">0</span>
+                                                <span class="badge bg-info" th:text="${user.cards != null ? user.cards.size() : 0}">0</span>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">

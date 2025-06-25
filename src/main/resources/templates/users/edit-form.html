@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un Utilisateur</title>
+    <title>Modifier l'Utilisateur</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -43,12 +43,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/web/users">
+                        <a class="nav-link active" href="/web/users">
                             <i class="fas fa-users"></i> Utilisateurs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/web/users/new">
+                        <a class="nav-link" href="/web/users/new">
                             <i class="fas fa-user-plus"></i> Nouvel Utilisateur
                         </a>
                     </li>
@@ -84,7 +84,8 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/web">Accueil</a></li>
                         <li class="breadcrumb-item"><a href="/web/users">Utilisateurs</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Nouveau</li>
+                        <li class="breadcrumb-item"><a th:href="@{/web/users/{id}(id=${user.id})}" th:text="${user.name}">Utilisateur</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Modifier</li>
                     </ol>
                 </nav>
 
@@ -101,9 +102,11 @@
                 <!-- Header -->
                 <div class="form-section">
                     <h1 class="h2 mb-3">
-                        <i class="fas fa-user-plus"></i> Ajouter un Nouvel Utilisateur
+                        <i class="fas fa-user-edit"></i> Modifier l'Utilisateur
                     </h1>
-                    <p class="mb-0">Remplissez les informations ci-dessous pour créer un nouveau compte utilisateur.</p>
+                    <p class="mb-0">
+                        Modifiez les informations de <strong th:text="${user.name}">l'utilisateur</strong>
+                    </p>
                 </div>
 
                 <!-- Form -->
@@ -114,7 +117,7 @@
                                 <h5><i class="fas fa-user"></i> Informations de l'Utilisateur</h5>
                             </div>
                             <div class="card-body">
-                                <form th:action="@{/web/users}" method="post" th:object="${user}">
+                                <form th:action="@{/web/users/{id}/edit(id=${user.id})}" method="post" th:object="${user}">
                                     <div class="row">
                                         <!-- Nom -->
                                         <div class="col-md-6 mb-4">
@@ -175,20 +178,30 @@
                                                 <div class="form-text">Doit être dans le passé</div>
                                             </div>
                                         </div>
+
+                                        <!-- User ID (readonly) -->
+                                        <div class="col-md-6 mb-4">
+                                            <div class="alert alert-info">
+                                                <small>
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <strong>ID Utilisateur:</strong> <span th:text="${user.id}">1</span>
+                                                </small>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Form Actions -->
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="d-flex gap-2 justify-content-end">
-                                                <a href="/web/users" class="btn btn-outline-secondary">
+                                                <a th:href="@{/web/users/{id}(id=${user.id})}" class="btn btn-outline-secondary">
                                                     <i class="fas fa-times"></i> Annuler
                                                 </a>
                                                 <button type="reset" class="btn btn-outline-warning">
                                                     <i class="fas fa-undo"></i> Réinitialiser
                                                 </button>
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="fas fa-save"></i> Créer l'Utilisateur
+                                                    <i class="fas fa-save"></i> Enregistrer les Modifications
                                                 </button>
                                             </div>
                                         </div>
@@ -200,48 +213,42 @@
 
                     <!-- Side Panel -->
                     <div class="col-lg-4">
-                        <!-- Help -->
+                        <!-- Current Info -->
                         <div class="card form-card mb-4">
                             <div class="card-header">
-                                <h6><i class="fas fa-question-circle"></i> Aide</h6>
+                                <h6><i class="fas fa-info-circle"></i> Informations Actuelles</h6>
                             </div>
                             <div class="card-body">
-                                <ul class="list-unstyled small">
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success"></i>
-                                        <strong>Nom :</strong> Nom complet de l'utilisateur
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success"></i>
-                                        <strong>Email :</strong> Doit être unique et valide
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-check text-success"></i>
-                                        <strong>Date :</strong> Date de naissance (passée)
-                                    </li>
-                                </ul>
-                                
-                                <div class="alert alert-info mt-3">
-                                    <small>
-                                        <i class="fas fa-info-circle"></i>
-                                        Après création, vous pourrez ajouter des cartes bancaires à cet utilisateur.
-                                    </small>
+                                <div class="mb-2">
+                                    <strong>Nom:</strong> <span th:text="${user.name}">Nom</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Email:</strong> <span th:text="${user.email}">Email</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Naissance:</strong> <span th:text="${#temporals.format(user.birthDate, 'dd/MM/yyyy')}">Date</span>
+                                </div>
+                                <div>
+                                    <strong>Cartes:</strong> <span class="badge bg-info" th:text="${#lists.size(user.cards ?: {})}">0</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Recent Users -->
+                        <!-- Actions -->
                         <div class="card form-card">
                             <div class="card-header">
-                                <h6><i class="fas fa-users"></i> Actions</h6>
+                                <h6><i class="fas fa-cogs"></i> Actions</h6>
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <a href="/web/users" class="btn btn-outline-primary">
-                                        <i class="fas fa-list"></i> Voir tous les utilisateurs
+                                    <a th:href="@{/web/users/{id}(id=${user.id})}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Voir les détails
                                     </a>
-                                    <a href="/web/" class="btn btn-outline-secondary">
-                                        <i class="fas fa-home"></i> Retour à l'accueil
+                                    <a th:href="@{/web/users/{id}/cards/new(id=${user.id})}" class="btn btn-outline-success">
+                                        <i class="fas fa-credit-card"></i> Ajouter une carte
+                                    </a>
+                                    <a href="/web/users" class="btn btn-outline-secondary">
+                                        <i class="fas fa-list"></i> Liste des utilisateurs
                                     </a>
                                 </div>
                             </div>
@@ -271,4 +278,4 @@ document.querySelector('form').addEventListener('submit', function(e) {
 });
 </script>
 </body>
-</html>
+</html> 

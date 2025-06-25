@@ -28,7 +28,7 @@
         </h5>
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link" href="/web/">
+            <a class="nav-link" href="/web">
               <i class="fas fa-home"></i> Accueil
             </a>
           </li>
@@ -70,32 +70,99 @@
 
         <!-- Search Form -->
         <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Filtres de Recherche</h5>
+            <a href="/web/cards/search" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-search-plus"></i> Recherche Avancée
+            </a>
+          </div>
           <div class="card-body">
             <form method="get" action="/web/cards">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="searchType" class="form-label">Type de recherche</label>
                   <select class="form-select" id="searchType" name="searchType">
-                    <option value="">Toutes les cartes</option>
+                    <option value="">Sélectionner...</option>
                     <option value="partial" th:selected="${searchType == 'partial'}">Numéro partiel</option>
                     <option value="email" th:selected="${searchType == 'email'}">Email utilisateur</option>
-                    <option value="expired" th:selected="${searchType == 'expired'}">Expiration avant</option>
+                    <option value="userName" th:selected="${searchType == 'userName'}">Nom utilisateur</option>
+                    <option value="cvv" th:selected="${searchType == 'cvv'}">Code CVV</option>
+                    <option value="expired" th:selected="${searchType == 'expired'}">Expiré avant</option>
                   </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                   <label for="search" class="form-label">Terme de recherche</label>
                   <input type="text" class="form-control" id="search" name="search"
-                         th:value="${search}" placeholder="Entrez votre recherche...">
+                         th:value="${search}" placeholder="Rechercher...">
+                </div>
+                <div class="col-md-2">
+                  <label for="cardType" class="form-label">Type de carte</label>
+                  <select class="form-select" id="cardType" name="cardType">
+                    <option value="">Tous types</option>
+                    <option th:each="type : ${cardTypes}" 
+                            th:value="${type}" 
+                            th:text="${type}"
+                            th:selected="${cardType == type}">Type</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="status" class="form-label">Statut</label>
+                  <select class="form-select" id="status" name="status">
+                    <option value="">Tous</option>
+                    <option value="active" th:selected="${status == 'active'}">Actives</option>
+                    <option value="expired" th:selected="${status == 'expired'}">Expirées</option>
+                  </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                   <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search"></i> Rechercher
+                    <i class="fas fa-search"></i> Filtrer
                   </button>
+                </div>
+              </div>
+              
+              <!-- Additional filters row -->
+              <div class="row mt-3">
+                <div class="col-md-3">
+                  <label for="sortBy" class="form-label">Trier par</label>
+                  <select class="form-select" id="sortBy" name="sortBy">
+                    <option value="expirationDate" th:selected="${sortBy == 'expirationDate'}">Date d'expiration</option>
+                    <option value="cardNumber" th:selected="${sortBy == 'cardNumber'}">Numéro de carte</option>
+                    <option value="type" th:selected="${sortBy == 'type'}">Type de carte</option>
+                    <option value="userName" th:selected="${sortBy == 'userName'}">Nom utilisateur</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="size" class="form-label">Par page</label>
+                  <select class="form-select" id="size" name="size">
+                    <option value="5" th:selected="${cardsPage.size == 5}">5</option>
+                    <option value="10" th:selected="${cardsPage.size == 10}">10</option>
+                    <option value="25" th:selected="${cardsPage.size == 25}">25</option>
+                    <option value="50" th:selected="${cardsPage.size == 50}">50</option>
+                  </select>
+                </div>
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                  <button type="reset" class="btn btn-outline-secondary" onclick="clearFilters()">
+                    <i class="fas fa-eraser"></i> Effacer
+                  </button>
+                  <a href="/web/cards" class="btn btn-outline-info">
+                    <i class="fas fa-list"></i> Toutes
+                  </a>
                 </div>
               </div>
             </form>
           </div>
         </div>
+
+        <script>
+        function clearFilters() {
+          document.getElementById('searchType').value = '';
+          document.getElementById('search').value = '';
+          document.getElementById('cardType').value = '';
+          document.getElementById('status').value = '';
+          document.getElementById('sortBy').value = 'expirationDate';
+          document.getElementById('size').value = '10';
+        }
+        </script>
 
         <!-- Results -->
         <div class="card">
@@ -151,6 +218,16 @@
                   </td>
                   <td>
                     <div class="btn-group" role="group">
+                      <a th:href="@{/web/cards/{id}(id=${card.id})}"
+                         class="btn btn-sm btn-outline-info"
+                         title="Voir détails">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a th:href="@{/web/cards/{id}/edit(id=${card.id})}"
+                         class="btn btn-sm btn-outline-warning"
+                         title="Modifier">
+                        <i class="fas fa-edit"></i>
+                      </a>
                       <a th:href="@{/web/users/{id}(id=${card.user.id})}"
                          class="btn btn-sm btn-outline-primary"
                          title="Voir utilisateur">

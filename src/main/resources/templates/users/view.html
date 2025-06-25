@@ -34,7 +34,7 @@
                 </h5>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="/web/">
+                        <a class="nav-link" href="/web">
                             <i class="fas fa-home"></i> Accueil
                         </a>
                     </li>
@@ -80,6 +80,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
+                <!-- Debug info -->
+                <div class="alert alert-info">
+                    <strong>Debug:</strong> Utilisateur chargé = <span th:text="${user != null}"></span>
+                    <span th:if="${user != null}"> | ID = <span th:text="${user.id}"></span> | Nom = <span th:text="${user.name}"></span></span>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h2">
                         <i class="fas fa-user"></i> Détails de l'Utilisateur
@@ -88,14 +94,14 @@
                         <a href="/web/users" class="btn btn-secondary me-2">
                             <i class="fas fa-arrow-left"></i> Retour
                         </a>
-                        <a th:href="@{/web/users/{id}/cards/new(id=${user.id})}" class="btn btn-success">
+                        <a th:if="${user != null}" th:href="@{/web/users/{id}/cards/new(id=${user.id})}" class="btn btn-success">
                             <i class="fas fa-plus"></i> Ajouter une Carte
                         </a>
                     </div>
                 </div>
 
                 <!-- User Information -->
-                <div class="row mb-4">
+                <div th:if="${user != null}" class="row mb-4">
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-header">
@@ -114,7 +120,7 @@
                                     <div class="col-sm-4"><strong>Email:</strong></div>
                                     <div class="col-sm-8" th:text="${user.email}"></div>
                                 </div>
-                                <div class="row mb-2" th:if="${user.birthDate}">
+                                <div class="row mb-2" th:if="${user.birthDate != null}">
                                     <div class="col-sm-4"><strong>Date de naissance:</strong></div>
                                     <div class="col-sm-8" th:text="${user.birthDate}"></div>
                                 </div>
@@ -123,16 +129,23 @@
                     </div>
                 </div>
 
+                <!-- Error message if user not found -->
+                <div th:if="${user == null}" class="alert alert-warning">
+                    <h4>Utilisateur non trouvé</h4>
+                    <p>L'utilisateur demandé n'existe pas dans la base de données.</p>
+                    <a href="/web/users" class="btn btn-primary">Retour à la liste</a>
+                </div>
+
                 <!-- Cards Section -->
-                <div class="card">
+                <div th:if="${user != null}" class="card">
                     <div class="card-header">
                         <h5>
                             <i class="fas fa-credit-card"></i> Cartes Bancaires
-                            <span class="badge bg-primary" th:text="${#lists.size(cards)}">0</span>
+                            <span class="badge bg-primary" th:text="${cards != null ? cards.size() : 0}">0</span>
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div th:if="${#lists.isEmpty(cards)}" class="text-center py-4">
+                        <div th:if="${cards == null or cards.isEmpty()}" class="text-center py-4">
                             <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">Aucune carte trouvée</h5>
                             <p class="text-muted">Cet utilisateur n'a pas encore de carte bancaire.</p>
@@ -141,20 +154,18 @@
                             </a>
                         </div>
 
-                        <div th:if="${!#lists.isEmpty(cards)}" class="table-responsive">
+                        <div th:if="${cards != null and !cards.isEmpty()}" class="table-responsive">
                             <table class="table table-hover">
                                 <thead class="table-dark">
                                 <tr>
                                     <th>Numéro</th>
                                     <th>Type</th>
                                     <th>Expiration</th>
-                                    <th>Statut</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="card : ${cards}"
-                                    th:class="${#temporals.isBefore(card.expirationDate, #temporals.createToday())} ? 'expired' : 'active'">
+                                <tr th:each="card : ${cards}">
                                     <td>
                                         <span class="card-number" th:text="${card.cardNumber}"></span>
                                     </td>
@@ -163,12 +174,6 @@
                                         <span th:text="${card.type}"></span>
                                     </td>
                                     <td th:text="${card.expirationDate}"></td>
-                                    <td>
-                                                <span th:if="${#temporals.isBefore(card.expirationDate, #temporals.createToday())}"
-                                                      class="badge bg-danger">Expirée</span>
-                                        <span th:unless="${#temporals.isBefore(card.expirationDate, #temporals.createToday())}"
-                                              class="badge bg-success">Active</span>
-                                    </td>
                                     <td>
                                         <a th:href="@{/web/cards/{id}/delete(id=${card.id})}"
                                            class="btn btn-sm btn-outline-danger"

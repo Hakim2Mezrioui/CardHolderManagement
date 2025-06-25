@@ -126,6 +126,11 @@
                                                        title="Voir détails">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+                                                    <a th:href="@{/web/users/{id}/edit(id=${user.id})}"
+                                                       class="btn btn-sm btn-outline-warning"
+                                                       title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
                                                     <a th:href="@{/web/users/{id}/cards/new(id=${user.id})}"
                                                        class="btn btn-sm btn-outline-success"
                                                        title="Ajouter une carte">

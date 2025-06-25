@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Détails de la carte ' + ${card.cardNumber}">Détails de la carte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .card-visual {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transform: perspective(1000px) rotateY(-5deg);
+        }
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        .card-info {
+            font-family: 'Courier New', monospace;
+        }
+        .status-badge {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+        }
+        .detail-card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .detail-card:hover {
+            transform: translateY(-2px);
+        }
+        .info-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h5 class="text-center mb-3">
+                    <i class="fas fa-credit-card"></i> Card Manager
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/users">
+                            <i class="fas fa-users"></i> Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/users/new">
+                            <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards">
+                            <i class="fas fa-credit-card"></i> Toutes les Cartes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards/search">
+                            <i class="fas fa-search-plus"></i> Recherche Avancée
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards/active">
+                            <i class="fas fa-check-circle"></i> Cartes Actives
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/web/cards/expired">
+                            <i class="fas fa-times-circle"></i> Cartes Expirées
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="pt-3">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/web/">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="/web/cards">Cartes</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${card.cardNumber}">Carte</li>
+                    </ol>
+                </nav>
+
+                <!-- Alert Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h2">
+                        <i class="fas fa-credit-card"></i> Détails de la Carte
+                    </h1>
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/web/cards/{id}/edit(id=${card.id})}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a th:href="@{/web/users/{id}(id=${card.user.id})}" class="btn btn-outline-primary">
+                            <i class="fas fa-user"></i> Voir l'Utilisateur
+                        </a>
+                        <a th:href="@{/web/cards/{id}/delete(id=${card.id})}" 
+                           class="btn btn-outline-danger"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Card Visual -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card detail-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-credit-card"></i> Représentation Visuelle</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="card-visual mx-auto" style="max-width: 400px;">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <i class="fas fa-wifi fa-2x" style="opacity: 0.7;"></i>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold" th:text="${card.type}">TYPE</div>
+                                            <div class="small" style="opacity: 0.8;">BANKING</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-number mb-3" th:text="${card.cardNumber}">
+                                        1234 5678 9012 3456
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-6">
+                                            <div class="small" style="opacity: 0.8;">VALIDE JUSQU'AU</div>
+                                            <div class="card-info" th:text="${#temporals.format(card.expirationDate, 'MM/yy')}">
+                                                12/26
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="small" style="opacity: 0.8;">CVV</div>
+                                            <div class="card-info" th:text="${card.cvv}">123</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 text-start">
+                                        <div class="small" style="opacity: 0.8;">TITULAIRE</div>
+                                        <div class="card-info text-uppercase" th:text="${card.user.name}">
+                                            NOM DU TITULAIRE
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Details -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card detail-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-info-circle"></i> Informations de la Carte</h5>
+                                <span th:if="${isExpired}" class="badge bg-danger status-badge">
+                                    <i class="fas fa-times-circle"></i> EXPIRÉE
+                                </span>
+                                <span th:unless="${isExpired}" class="badge bg-success status-badge">
+                                    <i class="fas fa-check-circle"></i> ACTIVE
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <div class="row">
+                                        <div class="col-4"><strong>Numéro :</strong></div>
+                                        <div class="col-8 card-info" th:text="${card.cardNumber}">1234567890123456</div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="row">
+                                        <div class="col-4"><strong>Type :</strong></div>
+                                        <div class="col-8">
+                                            <span th:text="${card.type}">Visa</span>
+                                            <i th:if="${card.type == 'Visa'}" class="fab fa-cc-visa text-primary ms-2"></i>
+                                            <i th:if="${card.type == 'Mastercard'}" class="fab fa-cc-mastercard text-warning ms-2"></i>
+                                            <i th:if="${card.type == 'American Express'}" class="fab fa-cc-amex text-success ms-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="row">
+                                        <div class="col-4"><strong>CVV :</strong></div>
+                                        <div class="col-8 card-info" th:text="${card.cvv}">123</div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="row">
+                                        <div class="col-4"><strong>Expiration :</strong></div>
+                                        <div class="col-8">
+                                            <span th:text="${#temporals.format(card.expirationDate, 'dd/MM/yyyy')}">31/12/2026</span>
+                                            <div class="small text-muted mt-1">
+                                                <span th:if="${isExpired}" class="text-danger">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    Expirée depuis <span th:text="${Math.abs(daysUntilExpiration)}">5</span> jours
+                                                </span>
+                                                <span th:unless="${isExpired}" class="text-success">
+                                                    <i class="fas fa-calendar-check"></i>
+                                                    Expire dans <span th:text="${daysUntilExpiration}">180</span> jours
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Information -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card detail-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user"></i> Informations du Titulaire</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="row">
+                                                <div class="col-4"><strong>Nom :</strong></div>
+                                                <div class="col-8" th:text="${card.user.name}">Nom de l'utilisateur</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="row">
+                                                <div class="col-4"><strong>Email :</strong></div>
+                                                <div class="col-8">
+                                                    <a th:href="'mailto:' + ${card.user.email}" 
+                                                       th:text="${card.user.email}">email@example.com</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="row">
+                                                <div class="col-4"><strong>Naissance :</strong></div>
+                                                <div class="col-8" th:text="${#temporals.format(card.user.birthDate, 'dd/MM/yyyy')}">
+                                                    01/01/1990
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="row">
+                                                <div class="col-4"><strong>ID Utilisateur :</strong></div>
+                                                <div class="col-8">
+                                                    <a th:href="@{/web/users/{id}(id=${card.user.id})}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                        <span th:text="${card.user.id}">1</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card detail-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-cogs"></i> Actions Disponibles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a th:href="@{/web/cards/{id}/edit(id=${card.id})}" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i> Modifier cette carte
+                                    </a>
+                                    <a th:href="@{/web/users/{id}(id=${card.user.id})}" class="btn btn-info">
+                                        <i class="fas fa-user"></i> Voir le profil utilisateur
+                                    </a>
+                                    <a th:href="@{/web/users/{userId}/cards/new(userId=${card.user.id})}" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Ajouter une autre carte
+                                    </a>
+                                    <a href="/web/cards" class="btn btn-outline-secondary">
+                                        <i class="fas fa-list"></i> Retour à la liste
+                                    </a>
+                                    <a th:href="@{/web/cards/{id}/delete(id=${card.id})}" 
+                                       class="btn btn-outline-danger"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette carte ? Cette action est irréversible.')">
+                                        <i class="fas fa-trash"></i> Supprimer cette carte
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
